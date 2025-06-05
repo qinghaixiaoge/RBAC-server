@@ -18,6 +18,7 @@ const {
   UniqueConstraintError,
   ForeignKeyConstraintError,
 } = require("sequelize");
+const { JsonWebTokenError } = require("jsonwebtoken");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -84,14 +85,17 @@ app.use((err, req, res, next) => {
   if (err.message === "父级菜单不存在") {
     return res.status(400).send({ code: false, msg: err.message, data: null });
   }
-
-  if (err instanceof UnauthorizedError) {
+  // UnauthorizedError 不携带token/token解密失败/token过期
+  // JsonWebTokenError token解密密钥不对
+  if (err instanceof UnauthorizedError || err instanceof JsonWebTokenError) {
     return res
       .status(401)
       .send({ code: false, msg: "无效token,请重新登录", data: null });
   }
 
-  return res.status(500).send({ code: false, msg: err.message, data: null });
+  return res
+    .status(500)
+    .send({ code: false, msg: "服务器错误，请联系管理员", data: null });
 });
 
 app.listen(process.env.PORT, () => {
