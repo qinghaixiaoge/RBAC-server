@@ -44,7 +44,7 @@ app.use(
     },
   }).unless({
     path: [
-      { url: "/static", methods: ["GET"] },
+      { url: /\/static\/.*/, methods: ["GET"] },
       { url: "/api/login", methods: ["POST"] },
       { url: "/api/register", methods: ["POST"] },
       { url: "/api/refresh_token", methods: ["GET"] },
